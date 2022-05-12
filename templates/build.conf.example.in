@@ -1,0 +1,149 @@
+##################################################
+# Build configuration
+##################################################
+
+# Build user
+BUILD_USER="jenkins"
+
+# User name & email
+USER_NAME="Jenkins"
+USER_EMAIL="davlet.panech@windriver.com"
+
+# Branch name, used as part of build directories & artifacts
+BUILD_BRANCH="master"
+
+# Project name, must be unique for a given BUILD_USER
+PROJECT_ID="dpanech-debian"
+# Should be the same as PROJECT_ID, but must contain only lower-case letters,
+# digits and dashes. It will be used as the k8s namespace and as part of the
+# build tools helm chart & service IDs.
+PROJECT="$(echo $PROJECT_ID | sed -r 's/[^a-zA-Z0-9-]+/-/g' | tr A-Z a-z)"
+
+# Repo manifest to clone
+MANIFEST_URL="https://opendev.org/starlingx/manifest"
+MANIFEST_BRANCH="master"
+MANIFEST="default.xml"
+
+# File containing product release information, relative to repo root
+RELEASE_INFO_FILE="cgcs-root/stx/utilities/utilities/build-info/release-info.inc"
+# Alternatively, set version explicitly
+#SW_VERSION="22.06"
+
+# How many times to call "build-pkgs"
+BUILD_PACKAGES_ITERATIONS=3
+
+# Debian snapshot URLs. Leave them empty to use the defaults hard-coded
+# in stx/tools
+DEBIAN_SNAPSHOT_BASE="http://https://snapshot.debian.org/archive/debian"
+DEBIAN_SECURITY_SNAPSHOT_BASE="https://snapshot.debian.org/archive/debian-security"
+
+# ISO sigining
+SIGN_ISO=false      # If false, don't signe the ISO
+SIGNING_SERVER="some.host.org"
+SIGNING_USER="some_user_id"
+
+##################################################
+# Build outputs
+##################################################
+
+# Archive artifacts in $BUILD_OUTPUT_ROOT/timestamp
+BUILD_OUTPUT_ROOT="/localdisk/loadbuild/$BUILD_USER/$PROJECT_ID"
+
+# Publish import artifacts to: $PUBLISH_ROOT/<PUBLISH_TIMESTAMP>/$PUBLISH_SUBDIR
+# Create latest symlink in:    $PUBLISH_ROOT/latest_build 
+
+# CENGN: publish to a location outside of the archive directory
+#PUBLISH_ROOT="/export/mirrors/$PROJECT_ID/$MANIFEST_BRANCH/debian/monolithic"
+#PUBLISH_ROOT_URL="http://$(hostname -f):8088${PUBLISH_ROOT}"
+#PUBLISH_SUBDIR=""                 # may be empty
+#PUBLISH_LATEST_LINK=true          # create latest symlink?
+
+# For private builds, publish to a subdirectory of the archive location
+PUBLISH_ROOT="$BUILD_OUTPUT_ROOT"
+PUBLISH_ROOT_URL="http://$(hostname -f):8088${PUBLISH_ROOT}"
+PUBLISH_SUBDIR="export"            # may be empty
+PUBLISH_LATEST_LINK=false          # create latest symlink?
+
+##################################################
+# Docker configuration
+##################################################
+
+# How many times to try building docker images
+DOCKER_BUILD_RETRY_COUNT=3
+
+# Docker config file used for authentication when pushing images. If empty,
+# defaults to $USER/.docker/config.json. May be relative to $BUILD_HOME.
+DOCKER_CONFIG_FILE="docker-config.json"
+
+# Push docker images to this registry. Empty value means docker hub.
+#DOCKER_REGISTRY="some.host.org:1234"
+DOCKER_REGISTRY=
+
+# Prefix docker image names with this namespace
+#DOCKER_REGISTRY_ORG="starlingx"
+DOCKER_REGISTRY_ORG="SOME_USER"
+
+# Additional "REGISTRY/NAMESPACE" to push docker images to,
+# may contain multiple elements, space-separated
+DOCKER_EXTRA_REGISTRY_PREFIX_LIST=
+
+# Space separated list of docker registries that require authentication
+# before pushing.
+#
+# Credentials must be in $DOCKER_CONFIG_FILE
+#DOCKER_REGISTRY_PUSH_LOGIN_LIST="some.host.org:1234"
+DOCKER_REGISTRY_PUSH_LOGIN_LIST=
+
+# Disable SSL validation for these docker registries, space-separasted
+INSECURE_DOCKER_REGISTRIES="some.host.org:1234 some.other.host.org:1234"
+
+# Use pod URLs in apt sources.list within the base image. This makes apt
+# sources in docker images unuseable outside of the builder pods.
+USE_POD_URLS_IN_DOCKER_IMAGES="false"
+
+# Docker base image OS
+DOCKER_BASE_OS="debian"
+
+# Docker image OS categories to build
+DOCKER_OS_LIST="debian distroless"
+
+# Base image for all docker images. If unset, we will build our own.
+DOCKER_IMAGE_BASE=
+
+
+##################################################
+# Jenkins & K8S parameters
+##################################################
+
+# Must be <= k8s container network's MTU
+CONTAINER_MTU="1410"
+
+# "kubernetes" or "minikube"
+K8S_PLATFORM="kubernetes"
+
+# Create builder pods in this k8s namespace
+K8S_NAMESPACE="$PROJECT_ID"
+
+# Start up time out for builder pods in seconds
+BUILDER_POD_STARTUP_TIMEOUT="300"
+
+# Used by the stx tool (?)
+BUILD_CPUS=4
+
+# Configuration for kubectl, if empty defaults to $USER/.kube/config
+KUBECONFIG=/localdisk/designer/jenkins/dpanech-debian/kube-config
+
+# Minikube memory (default: auto)
+MINIKUBEMEMORY=
+
+# Minikube home dir (default: $HOME), must not be NFS
+MINIKUBE_HOME=
+
+# A jenkins "credentials" record that contains the username/password for
+# accessing Jenkins' REST API.
+JENKINS_API_CREDENTIALS_ID="jenkins-api"
+
+# GNU parallel - if not empty must be a command installed on host
+# Makes some operations faster
+PARALLEL_CMD="parallel"
+PARALLEL_CMD_JOBS="12"
