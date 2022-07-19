@@ -61,35 +61,30 @@ function with_default_retries {
 
 PUBLISH_OUTPUTS_DIR="${PUBLISH_DIR}/outputs"
 
-for BT in "${BUILD_TYPES[@]}" ; do
-    ISO_OUTPUT="${BUILD_OUTPUT_HOME}/localdisk/lat/${BT}/deploy"
-    if [ -d "${ISO_OUTPUT}" ]; then
-        PUBLISH_ISO_DIR="${PUBLISH_OUTPUTS_DIR}/${BT}/iso"
-        with_default_retries mkdir -p ${PUBLISH_ISO_DIR}
-        for ISO in $(find ${ISO_OUTPUT} -name 'starlingx*.iso'); do
-            if [ "${BT}" == "std" ]; then
-                B_NAME=$(basename "${ISO}")
-            else
-                B_NAME=$(basename "${ISO}" | sed "s/starlingx-/starlingx-${BT}-/")
-            fi
-            if [ -L "${ISO}" ] ; then
-                src_iso="$(readlink -f "${ISO}")" || exit 1
-            else
-                src_iso="${ISO}"
-            fi
-            src_sig="${src_iso%.iso}.sig"
-            cp_or_link "${src_iso}" "${PUBLISH_ISO_DIR}"
-            if [[ -f "$src_sig" ]] ; then
-                cp -f "${src_sig}" "${PUBLISH_ISO_DIR}"
-            fi
-            link_target="$(basename "${src_iso}")"
-            if [ "${link_target}" != "${B_NAME}" ] ; then
-                ln -s -f -n "${link_target}" "${PUBLISH_ISO_DIR}/${B_NAME}" || exit 1
-                sig_link_target="${link_target%.iso}.sig"
-                sig_link="${PUBLISH_ISO_DIR}/${B_NAME%.iso}.sig"
-                ln -s -f -n "${sig_link_target}" "${sig_link}"
-            fi
-        done
-    fi
-done
+ISO_OUTPUT="${BUILD_OUTPUT_HOME}/localdisk/deploy"
+if [ -d "${ISO_OUTPUT}" ]; then
+    PUBLISH_ISO_DIR="${PUBLISH_OUTPUTS_DIR}/iso"
+    with_default_retries mkdir -p ${PUBLISH_ISO_DIR}
+    for ISO in $(find ${ISO_OUTPUT} -name 'starlingx*.iso'); do
+        B_NAME=$(basename "${ISO}")
+
+        if [ -L "${ISO}" ] ; then
+            src_iso="$(readlink -f "${ISO}")" || exit 1
+        else
+            src_iso="${ISO}"
+        fi
+        src_sig="${src_iso%.iso}.sig"
+        cp_or_link "${src_iso}" "${PUBLISH_ISO_DIR}"
+        if [[ -f "$src_sig" ]] ; then
+            cp -f "${src_sig}" "${PUBLISH_ISO_DIR}"
+        fi
+        link_target="$(basename "${src_iso}")"
+        if [ "${link_target}" != "${B_NAME}" ] ; then
+            ln -s -f -n "${link_target}" "${PUBLISH_ISO_DIR}/${B_NAME}" || exit 1
+            sig_link_target="${link_target%.iso}.sig"
+            sig_link="${PUBLISH_ISO_DIR}/${B_NAME%.iso}.sig"
+            ln -s -f -n "${sig_link_target}" "${sig_link}"
+        fi
+    done
+fi
 

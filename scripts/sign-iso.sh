@@ -37,10 +37,7 @@ sign_iso() {
 
 
 declare -a iso_files
-iso_files+=($BUILD_HOME/localdisk/lat/std/deploy/starlingx-intel-x86-64-cd.iso)
-if $BUILD_RT ; then
-    iso_files+=($BUILD_HOME/localdisk/lat/rt/deploy/starlingx-intel-x86-64-cd.iso)
-fi
+iso_files+=($BUILD_HOME/localdisk/deploy/starlingx-intel-x86-64-cd.iso)
 
 for iso_file in "${iso_files[@]}" ; do
     if [[ -L "$iso_file" ]] ; then

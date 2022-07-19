@@ -17,11 +17,8 @@ BUILD_PACKAGES_LIST=$(trim $(echo $BUILD_PACKAGES_LIST | sed 's/,/ /g'))
 info "CLEAN_PACKAGES=$CLEAN_PACKAGES"
 info "BUILD_PACKAGES_LIST=$BUILD_PACKAGES_LIST"
 
-# Always build std, rt only if requested
-build_types="std"
-if $BUILD_RT ; then
-    build_types+=",rt"
-fi
+# build std and rt as we have a single iso for both
+build_types="std,rt"
 
 count=0
 success=0

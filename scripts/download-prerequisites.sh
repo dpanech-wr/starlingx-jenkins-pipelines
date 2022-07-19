@@ -7,7 +7,7 @@ require_env BUILD_RT
 
 load_build_env
 
-build_types=std
+build_types="std"
 if $BUILD_RT ; then
     build_types+=",rt"
 fi

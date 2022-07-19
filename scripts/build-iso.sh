@@ -12,12 +12,4 @@ load_build_env
 $BUILD_ISO || bail "BUILD_ISO=false, bailing out"
 
 notice "building STD ISO"
-stx_docker_cmd $DRY_RUN_ARG "build-image --std"
-if ! $DRY_RUN ; then
-    ln -sfn lat/std/deploy "$BUILD_HOME/localdisk/deploy"
-fi
-
-if $BUILD_RT ; then
-    notice "building RT ISO"
-    stx_docker_cmd $DRY_RUN_ARG "build-image --rt"
-fi
+stx_docker_cmd $DRY_RUN_ARG "build-image"
