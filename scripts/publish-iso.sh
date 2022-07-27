@@ -20,7 +20,7 @@ find_checksum_files "${PUBLISH_SUBDIR}/outputs/std/iso" \
 
 dst_dir="${PUBLISH_DIR}/outputs/iso"
 checksum_file="$dst_dir/$CHECKSUMS_FILENAME"
-regfile_list_file="$TEMP_DIR/iso_files
+regfile_list_file="$TEMP_DIR/iso_files"
 
 src_dir="$BUILD_OUTPUT_HOME/localdisk/deploy"
 abs_src_dir="$(readlink -e "$src_dir")" || continue
