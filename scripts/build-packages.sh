@@ -8,6 +8,7 @@ require_env BUILD_PACKAGES
 declare_env BUILD_PACKAGES_LIST
 require_env BUILD_RT
 require_env CLEAN_PACKAGES
+require_env BUILD_ISO
 
 load_build_env
 

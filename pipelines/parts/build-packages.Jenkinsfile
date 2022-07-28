@@ -43,6 +43,9 @@ pipeline {
         booleanParam (
             name: 'CLEAN_PACKAGES'
         )
+        booleanParam (
+            name: 'BUILD_ISO'
+        )
     }
 
     stages {

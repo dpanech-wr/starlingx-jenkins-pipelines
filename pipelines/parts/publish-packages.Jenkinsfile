@@ -34,6 +34,9 @@ pipeline {
         booleanParam (
             name: 'BUILD_RT'
         )
+        booleanParam (
+            name: 'BUILD_ISO'
+        )
     }
 
     stages {
