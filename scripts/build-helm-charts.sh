@@ -10,6 +10,7 @@ load_build_env
 
 BUILD_STREAMS="stable dev"
 BUILD_TAGS="latest versioned"
+HELM_CHART_APPS=$(echo $HELM_CHART_APPS | sed -r 's/,+//g')
 
 # find image dirs relative to WORKSPACE_ROOT
 declare -a image_dirs
@@ -58,16 +59,23 @@ if [[ "${#image_dirs[@]}" -gt 0 ]] ; then
                 )
                 check_pipe_status || exit 1
 
-                if [[ -n "$image_arg" ]] ; then
+                if [[ -z "$image_arg" ]] ; then
+                    continue
+                fi
+
+                for app in ${HELM_CHART_APPS:-NONE} ; do
                     cmd="build-helm-charts.sh"
-                    cmd+=" --os ${os}"
-                    cmd+=" --image-record ${image_arg}"
-                    cmd+=" --label '${label}'"
                     cmd+=" --verbose"
+                    cmd+=" --os ${os}"
+                    cmd+=" --label '${label}'"
+                    cmd+=" --image-record ${image_arg}"
+                    if [[ "$app" != "NONE" ]] ; then
+                        cmd+=" --app $app"
+                    fi
                     cmd+=" | tee \"\$MY_WORKSPACE/helm-${label}.log\""
                     cmd+=" ; [[ \${PIPESTATUS[0]} -eq 0 ]]"
                     build_helm_charts "$cmd" || exit 1
-                fi
+                done
             done
         done
     done

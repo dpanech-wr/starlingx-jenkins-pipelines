@@ -48,6 +48,7 @@ SIGNING_USER="some_user_id"
 
 # Archive artifacts in $BUILD_OUTPUT_ROOT/timestamp
 BUILD_OUTPUT_ROOT="/localdisk/loadbuild/$BUILD_USER/$PROJECT_ID"
+BUILD_OUTPUT_ROOT_URL="http://$(hostname -f):8088${BUILD_OUTPUT_ROOT}"
 
 # Publish import artifacts to: $PUBLISH_ROOT/<PUBLISH_TIMESTAMP>/$PUBLISH_SUBDIR
 # Create latest symlink in:    $PUBLISH_ROOT/latest_build 
@@ -110,6 +111,9 @@ DOCKER_OS_LIST="debian distroless"
 # Base image for all docker images. If unset, we will build our own.
 DOCKER_IMAGE_BASE=
 
+# Helm chart apps, comma or space-separated.
+# This will be passed to build-helm-charts.sh
+HELM_CHART_APPS=
 
 ##################################################
 # Jenkins & K8S parameters

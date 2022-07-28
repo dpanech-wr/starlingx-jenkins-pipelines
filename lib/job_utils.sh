@@ -132,6 +132,17 @@ __set_common_vars() {
 }
 
 __set_build_vars() {
+
+    require_env BUILD_USER
+    require_env PROJECT
+    require_env BUILD_HOME
+    require_env BUILD_OUTPUT_ROOT
+    require_env BUILD_OUTPUT_ROOT_URL
+    require_env TIMESTAMP
+    require_env PUBLISH_ROOT
+    require_env PUBLISH_ROOT_URL
+    require_env PUBLISH_TIMESTAMP
+
     # Set a few additional globals
     REPO_ROOT_SUBDIR=localdisk/designer/$BUILD_USER/$PROJECT
     WORKSPACE_ROOT_SUBDIR=localdisk/loadbuild/$BUILD_USER/$PROJECT
@@ -139,6 +150,7 @@ __set_build_vars() {
     WORKSPACE_ROOT="$BUILD_HOME/workspace"
     USER_ID=$(id -u $BUILD_USER) || exit 1
     BUILD_OUTPUT_HOME="$BUILD_OUTPUT_ROOT/$TIMESTAMP"
+    BUILD_OUTPUT_HOME_URL="$BUILD_OUTPUT_ROOT_URL/$TIMESTAMP"
 
     # publish vars
     PUBLISH_DIR="${PUBLISH_ROOT}/${PUBLISH_TIMESTAMP}${PUBLISH_SUBDIR:+/$PUBLISH_SUBDIR}"

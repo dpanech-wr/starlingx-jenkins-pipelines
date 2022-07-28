@@ -2,19 +2,19 @@
 
 library "common@${params.JENKINS_SCRIPTS_BRANCH}"
 
-//def parseProps(text) {
-//    def x = {}
-//    for (line in text.split (/\n+/)) {
-//        if (line.matches (/\s*(?:#.*)?#/)) {
-//            continue
-//        }
-//        parts = line.split ("=", 2)
-//        key = parts[0]
-//        value = parts[1]
-//        x."${key}" = value
-//    }
-//    return x
-//}
+def parseProps(text) {
+    def x = {}
+    for (line in text.split (/\n+/)) {
+        if (line.matches (/\s*(?:#.*)?#/)) {
+            continue
+        }
+        parts = line.split ("=", 2)
+        key = parts[0]
+        value = parts[1]
+        x."${key}" = value
+    }
+    return x
+}
 
 def loadEnv() {
     def data = {}
@@ -23,10 +23,14 @@ def loadEnv() {
             data.NEED_BUILD = true
         }
     }
+    final String configText = sh (script: "${Constants.SCRIPTS_DIR}/print-config.sh", returnStdout: true)
+    final props = parseProps (configText)
+    data.BUILD_OUTPUT_HOME_URL = props.BUILD_OUTPUT_HOME_URL
     return data
 }
 
 def PROPS = null
+def IMG_PARAMS = null
 
 def partJobName (name) {
     final String folder = env.JOB_NAME.replaceAll (/(.*\/).+$/, '$1');
@@ -38,6 +42,18 @@ def partJobName (name) {
 
 def runPart (name, params = []) {
     build job: partJobName (name), parameters: copyCurrentParams() + params
+}
+
+def printBuildFooter(final props) {
+    if (props) {
+        echo """
+========================================
+
+Build output: ${props.BUILD_OUTPUT_HOME_URL}
+
+========================================
+"""
+    }
 }
 
 setBuildDescr()
@@ -115,6 +131,9 @@ pipeline {
             name: 'PUSH_DOCKER_IMAGES'
         )
         booleanParam (
+            name: 'BUILD_HELM_CHARTS'
+        )
+        booleanParam (
             name: 'IMPORT_BUILD'
         )
         string (
@@ -140,6 +159,7 @@ pipeline {
                     if (!PROPS.NEED_BUILD) {
                         println "*** NO CHANGES, BUILD NOT REQUIRED ***"
                     }
+                    IMG_PARAMS = [ string (name: 'BUILD_STREAM', value: 'stable') ]
                 }
             }
         }
@@ -176,16 +196,27 @@ pipeline {
                     } // stage('ISO')
                     stage('IMAGES') {
                         when { expression { params.BUILD_DOCKER_IMAGES } }
-                        steps { script {
-                            imageParams = [ string (name: 'BUILD_STREAM', value: 'stable') ]
-                            runPart ("build-wheels", imageParams)
-                            runPart ("publish-wheels", imageParams)
-                            runPart ("build-docker-base", imageParams)
-                            runPart ("build-docker-images", imageParams)
-                            runPart ("publish-docker-images", imageParams)
-                            runPart ("build-helm-charts", imageParams)
-                            runPart ("publish-helm-charts", imageParams)
-                        } }
+                        stages {
+                            stage('IMAGES:wheels') { steps { script {
+                                runPart ("build-wheels", IMG_PARAMS)
+                                runPart ("publish-wheels", IMG_PARAMS)
+                            } } }
+                            stage('IMAGES:base') { steps { script {
+                                runPart ("build-docker-base", IMG_PARAMS)
+                                runPart ("build-docker-images", IMG_PARAMS)
+                            } } }
+                            stage('IMAGES:images') { steps { script {
+                                runPart ("build-docker-images", IMG_PARAMS)
+                                runPart ("publish-docker-images", IMG_PARAMS)
+                            } } }
+                            stage('IMAGES:helm') {
+                                when { expression { params.BUILD_HELM_CHARTS } }
+                                steps { script {
+                                    runPart ("build-helm-charts", IMG_PARAMS)
+                                    runPart ("publish-helm-charts", IMG_PARAMS)
+                                } }
+                            }
+                        }
                     } // stage('IMAGES')
                 } }// stage('X1')
             } // stages
@@ -213,6 +244,7 @@ pipeline {
             notAborted {
                 runPart ("publish-logs")
             }
+            printBuildFooter (PROPS)
         }
     }
 }
