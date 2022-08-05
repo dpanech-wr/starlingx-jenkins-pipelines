@@ -46,11 +46,14 @@ pipeline {
                             fi
                         """
                     );
+                    if (!jenkins_api_credentials_id) {
+                        error ("JENKINS_API_CREDENTIALS_ID is not defined in ${build_conf}")
+                    }
                     withEnv (["BUILD_HOME=${params.BUILD_HOME}"]) {
                         withCredentials ([usernameColonPassword (
                                              credentialsId: jenkins_api_credentials_id,
                                              variable: 'JENKINS_API_USERPASS')]) {
-                            sh "v3/scripts/publish-logs.sh"
+                            sh "${Constants.SCRIPTS_DIR}/publish-logs.sh"
                         }
                     }
                 }

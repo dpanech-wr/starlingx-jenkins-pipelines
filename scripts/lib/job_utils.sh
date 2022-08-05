@@ -1,5 +1,5 @@
-: ${LOADBUILD_ROOT:="/localdisk/loadbuild"}
-: ${DESIGNER_ROOT:="/localdisk/designer"}
+: ${LOADBUILD_ROOTS:="/localdisk/loadbuild:/home/localdisk/loadbuild"}
+: ${DESIGNER_ROOTS:="/localdisk/designer:/home/localdisk/designer"}
 
 source "${BASH_SOURCE[0]%/*}"/utils.sh || return 1
 source "${BASH_SOURCE[0]%/*}"/log_utils.sh || return 1
@@ -254,10 +254,11 @@ __get_protected_dirs() {
     [[ -n "$USER" ]] || die "USER not set"
     [[ -n "$PROJECT" ]] || die "PROJECT not set"
 
-    echo "$DESIGNER_ROOT:ro"
-    echo "$LOADBUILD_ROOT:ro"
-    echo "$DESIGNER_ROOT/$USER/$PROJECT"
-    echo "$LOADBUILD_ROOT/$USER/$PROJECT"
+    local dir
+    for dir in $(echo "$DESIGNER_ROOTS" "$LOADBUILD_ROOTS" | sed 's/:/ /g') ; do
+        echo "$dir:ro"
+        echo "$dir/$USER/$PROJECT"
+    done
 }
 
 #

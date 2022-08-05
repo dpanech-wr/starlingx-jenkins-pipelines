@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-source $(dirname "$0")/../lib/job_utils.sh
+source $(dirname "$0")/lib/job_utils.sh
 
 require_env BUILD_HOME
 require_env DRY_RUN
@@ -22,7 +22,10 @@ if [[ -n "$DOCKER_IMAGE_BASE" ]] ; then
     base_img="$DOCKER_IMAGE_BASE"
 else
     base_image_tag="$BUILD_BRANCH-$BUILD_STREAM-$TIMESTAMP"
-    base_img="$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/stx-$DOCKER_BASE_OS:$base_image_tag"
+    base_img="$DOCKER_REGISTRY_ORG/stx-$DOCKER_BASE_OS:$base_image_tag"
+    if [[ -n "$DOCKER_REGISTRY" ]] ; then
+        base_img="$DOCKER_REGISTRY/$base_img"
+    fi
 fi
 
 declare -a cmd=(
@@ -33,10 +36,13 @@ declare -a cmd=(
     "--no-pull-base"
     "--version=$TIMESTAMP"
     "--prefix=$BUILD_BRANCH"
-    "--registry=$DOCKER_REGISTRY"
     "--user=$DOCKER_REGISTRY_ORG"
     "--latest"
 )
+
+if [[ -n "$DOCKER_REGISTRY" ]] ; then
+    cmd+=("--registry=$DOCKER_REGISTRY")
+fi
 
 if [[ -f "$WORKSPACE_ROOT/$wheels_file" ]] ; then
     cmd+=("--wheels=\$MY_WORKSPACE/$wheels_file")

@@ -22,6 +22,9 @@ pipeline {
         string (
             name: 'BUILD_HOME'
         )
+        string (
+            name: 'TIMESTAMP'
+        )
         booleanParam (
             name: 'DRY_RUN'
         )

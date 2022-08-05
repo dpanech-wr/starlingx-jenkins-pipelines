@@ -2,8 +2,8 @@
 
 #set -e
 
-source $(dirname "$0")/../lib/job_utils.sh || exit 1
-source $(dirname "$0")/../lib/publish_utils.sh || exit 1
+source $(dirname "$0")/lib/job_utils.sh || exit 1
+source $(dirname "$0")/lib/publish_utils.sh || exit 1
 
 require_env BUILD_RT || exit 1
 require_env BUILD_ISO || exit 1

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-source $(dirname "$0")/../lib/job_utils.sh
+source $(dirname "$0")/lib/job_utils.sh
 
 require_env BUILD_STATUS
 
@@ -14,6 +14,16 @@ fi
 touch "$BUILD_OUTPUT_HOME/FAIL"
 
 ARCHIVE_ROOT=$(dirname "$BUILD_OUTPUT_HOME")
+
+same_path() {
+    if [[ ! -e "$1" && ! -e "$2" ]] ; then
+        return 1
+    fi
+    local a b
+    a="$(readlink -f "$1")" || exit 1
+    b="$(readlink -f "$2")" || exit 1
+    [[ "$a" == "$b" ]]
+}
 
 if [[ "$BUILD_STATUS" == "success" ]] ; then
     ARCHIVE_ROOT=$(dirname "$BUILD_OUTPUT_HOME")

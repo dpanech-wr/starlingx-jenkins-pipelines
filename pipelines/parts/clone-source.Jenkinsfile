@@ -28,6 +28,9 @@ pipeline {
         string (
             name: 'PUBLISH_TIMESTAMP'
         )
+        booleanParam (
+            name: 'DRY_RUN'
+        )
         string (
             name: 'REFRESH_SOURCE'
         )

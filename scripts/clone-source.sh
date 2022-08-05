@@ -1,8 +1,8 @@
 #!/bin/bash
 
 set -e
-source $(dirname "$0")/../lib/job_utils.sh
-source $(dirname "$0")/../lib/retries.sh
+source $(dirname "$0")/lib/job_utils.sh
+source $(dirname "$0")/lib/retries.sh
 
 require_env BUILD_HOME
 require_env DRY_RUN

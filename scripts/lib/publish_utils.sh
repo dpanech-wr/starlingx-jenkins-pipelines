@@ -71,7 +71,7 @@ publish_file() {
 
     # if all else fails, copy it
     if [[ "$link_created" != "link_created" ]] ; then
-        \cp -f --preserve=mode,timestamps,xattr "$filename" "$dst_file" || exit 1
+        \cp -f --preserve=mode,timestamps "$filename" "$dst_file" || exit 1
         echo "COPY    $dst_file" >&2
     fi
 

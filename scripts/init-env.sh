@@ -1,7 +1,10 @@
 #!/bin/bash
 
 set -e
-source $(dirname "$0")/../lib/job_utils.sh
+SCRIPTS_DIR="$(dirname "$0")"
+source "$SCRIPTS_DIR/lib/job_utils.sh"
+
+require_env BUILD_HOME
 
 if [[ -d "$BUILD_HOME" ]] ; then
     info "creating $BUILD_HOME"
@@ -11,7 +14,7 @@ fi
 if [[ ! -f "$BUILD_HOME/build.conf" ]] ; then
     info "$BUILD_HOME/build.conf: file not found"
     info "creating $BUILD_HOME/build.conf.example"
-    cp "$TOP_SCRIPTS_DIR/templates/build.conf.example.in" "$BUILD_HOME/build.conf.example"
+    cp "$SCRIPTS_DIR/templates/build.conf.example.in" "$BUILD_HOME/build.conf.example"
     info "Please use the example file as the starting point"
     exit 1
 fi
@@ -29,7 +32,7 @@ done
 
 # Install source_me.sh to $BUILD_HOME
 info "creating $BUILD_HOME/source_me.sh"
-cp "$TOP_SCRIPTS_DIR/templates/source_me.sh.in" "$BUILD_HOME/source_me.sh"
+cp "$SCRIPTS_DIR/templates/source_me.sh.in" "$BUILD_HOME/source_me.sh"
 
 # Delete old jenkins job list
 if [[ -d "$BUILD_HOME/jenkins" ]] ; then

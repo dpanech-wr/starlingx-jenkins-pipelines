@@ -1,11 +1,10 @@
 #!/bin/bash
 
 set -e
-source $(dirname "$0")/../lib/job_utils.sh
+source $(dirname "$0")/lib/job_utils.sh
 
 require_env BUILD_HOME
 require_env BUILD_ISO
-require_env BUILD_RT
 
 load_build_env
 

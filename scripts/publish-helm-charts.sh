@@ -1,13 +1,13 @@
 #!/bin/bash
 
 set -e
-source $(dirname "$0")/../lib/job_utils.sh
+source $(dirname "$0")/lib/job_utils.sh
 
 load_build_env
 
 $DRY_RUN && bail "DRY_RUN not supported, bailing out" || :
 
-src_dir="$BUILD_OUTPUT_HOME/$WORKSPACE_ROOT_SUBDIR/std/build-helm/stx"
+src_dir="$BUILD_OUTPUT_HOME/$WORKSPACE_ROOT_SUBDIR/helm-charts/stx"
 dst_dir="$PUBLISH_DIR/outputs/helm-charts"
 
 files="$(

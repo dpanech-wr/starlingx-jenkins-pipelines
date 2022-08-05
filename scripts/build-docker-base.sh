@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-source $(dirname "$0")/../lib/job_utils.sh
+source $(dirname "$0")/lib/job_utils.sh
 
 require_env BUILD_HOME
 require_env DRY_RUN
@@ -26,11 +26,14 @@ declare -a cmd=(
     "--version=$base_image_tag"
     "--attempts=$DOCKER_BUILD_RETRY_COUNT"
     "--stream=$BUILD_STREAM"
-    "--registry=$DOCKER_REGISTRY"
     "--user=$DOCKER_REGISTRY_ORG"
     "--latest"
     "--latest-tag=$base_image_latest_tag"
 )
+
+if [[ -n "$DOCKER_REGISTRY" ]] ; then
+    cmd+=("--registry=$DOCKER_REGISTRY")
+fi
 
 if [[ "$USE_DOCKER_CACHE" == true ]] ; then
     cmd+=("--cache")

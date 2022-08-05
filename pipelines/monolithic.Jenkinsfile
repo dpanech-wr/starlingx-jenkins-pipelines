@@ -18,6 +18,7 @@ def parseProps(text) {
 
 def loadEnv() {
     def data = {}
+    data.NEED_BUILD = false
     ws(params.BUILD_HOME) {
         if (fileExists ("NEED_BUILD")) {
             data.NEED_BUILD = true
@@ -26,6 +27,7 @@ def loadEnv() {
     final String configText = sh (script: "${Constants.SCRIPTS_DIR}/print-config.sh", returnStdout: true)
     final props = parseProps (configText)
     data.BUILD_OUTPUT_HOME_URL = props.BUILD_OUTPUT_HOME_URL
+    data.PUBLISH_URL = props.PUBLISH_URL
     return data
 }
 
@@ -46,13 +48,23 @@ def runPart (name, params = []) {
 
 def printBuildFooter(final props) {
     if (props) {
-        echo """
-========================================
-
-Build output: ${props.BUILD_OUTPUT_HOME_URL}
-
-========================================
-"""
+        String msg = ""
+        msg += "\n"
+        msg += "========================================\n"
+        msg += "\n"
+        if (props.NEED_BUILD) {
+            msg += "Build output:   ${props.BUILD_OUTPUT_HOME_URL}\n"
+            if (props.PUBLISH_URL) {
+                msg += "Publish output: ${props.PUBLISH_URL}\n"
+            }
+        }
+        else {
+            echo "*** NO CHANGES - BUILD NOT REQUIRED"
+        }
+        msg += "\n"
+        msg += "========================================\n"
+        msg += "\n"
+        echo (msg)
     }
 }
 

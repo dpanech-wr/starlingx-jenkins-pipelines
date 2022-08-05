@@ -38,19 +38,10 @@ pipeline {
             name: 'BUILD_DOCKER_IMAGES_STABLE'
         )
     }
-    environment {
-        PATH                       = "/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin"
-        SCRIPTS_DIR                = "${WORKSPACE}/v3/scripts"
-        BUILD_HOME                 = "${BUILD_HOME}"
-        TIMESTAMP                  = "${TIMESTAMP}"
-        FORCE_BUILD                = "${FORCE_BUILD}"
-        BUILD_DOCKER_IMAGES_DEV    = "${BUILD_DOCKER_IMAGES_DEV}"
-        BUILD_DOCKER_IMAGES_STABLE = "${BUILD_DOCKER_IMAGES_STABLE}"
-    }
     stages {
         stage ("create-changelog") {
             steps {
-                sh ("${SCRIPTS_DIR}/create-changelog.sh")
+                sh ("${Constants.SCRIPTS_DIR}/create-changelog.sh")
             }
         }
     }

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-source $(dirname "$0")/../lib/job_utils.sh
+source $(dirname "$0")/lib/job_utils.sh
 
 require_env BUILD_HOME
 require_env PUSH_DOCKER_IMAGES
@@ -24,7 +24,7 @@ for login_spec in $DOCKER_REGISTRY_PUSH_LOGIN_LIST ; do
     read login_reg dummy <<<$(parse_docker_registry "$login_spec")
     # check if we intend to push to it
     declare spec reg
-    for spec in $DOCKER_REGISTRY $DOCKER_EXTRA_REGISTRY_PREFIX_LIST ; do
+    for spec in ${DOCKER_REGISTRY:-docker.io} $DOCKER_EXTRA_REGISTRY_PREFIX_LIST ; do
         read reg dummy <<<$(parse_docker_registry "$spec")
         if [[ "$reg" == "$login_reg" && -z "${login_repos_hash[$reg]}" ]] ; then
             login_repos_hash["$reg"]=1
@@ -52,7 +52,7 @@ unset login_repos_hash
 #
 if [[ -z "$DOCKER_CONFIG_FILE" ]] ; then
     DOCKER_CONFIG_FILE=~/.docker/config.json
-elif [[ ! $DOCKER_CONFIG =~ ^/ ]] ; then
+elif [[ ! $DOCKER_CONFIG_FILE =~ ^/ ]] ; then
     DOCKER_CONFIG_FILE="$BUILD_HOME/$DOCKER_CONFIG_FILE"
 fi
 require_file "$DOCKER_CONFIG_FILE"

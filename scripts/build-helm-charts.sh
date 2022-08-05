@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-source $(dirname "$0")/../lib/job_utils.sh
+source $(dirname "$0")/lib/job_utils.sh
 
 require_env BUILD_HOME
 require_env DRY_RUN
@@ -39,8 +39,16 @@ build_helm_charts() {
     stx_docker_cmd $DRY_RUN_ARG "set -e ; cd \"\$MY_REPO/build-tools\" ; export PATH=\"\$PWD:\$PATH\" ; $cmd"
 }
 
+copy_dir() {
+    find "$1" -mindepth 1 -maxdepth 1 -exec cp -f -alr -t "$2" '{}' '+'
+}
+
 # call build-helm-charts.sh in container for each stream/tag
 if [[ "${#image_dirs[@]}" -gt 0 ]] ; then
+    output_dir="$BUILD_HOME/workspace/helm-charts"
+    if [[ -d "$output_dir" ]] ; then
+        rm -rf --one-file-system "$output_dir" || exit 1
+    fi
     for build_stream in $BUILD_STREAMS ; do
         for build_tag in $BUILD_TAGS ; do
             for os in $DOCKER_BASE_OS ; do
@@ -63,6 +71,8 @@ if [[ "${#image_dirs[@]}" -gt 0 ]] ; then
                     continue
                 fi
 
+                tmp_output_dir=$BUILD_HOME/workspace/std/build-helm
+
                 for app in ${HELM_CHART_APPS:-NONE} ; do
                     cmd="build-helm-charts.sh"
                     cmd+=" --verbose"
@@ -75,8 +85,15 @@ if [[ "${#image_dirs[@]}" -gt 0 ]] ; then
                     cmd+=" | tee \"\$MY_WORKSPACE/helm-${label}.log\""
                     cmd+=" ; [[ \${PIPESTATUS[0]} -eq 0 ]]"
                     build_helm_charts "$cmd" || exit 1
+                    if [[ -d "$tmp_output_dir" ]] ; then
+                        mkdir -p "$output_dir" || exit 1
+                        copy_dir "$tmp_output_dir" "$output_dir" || exit 1
+                    fi
                 done
             done
         done
     done
+    if [[ -d "$output_dir" ]] ; then
+        notice "helm charts created in $output_dir"
+    fi
 fi
