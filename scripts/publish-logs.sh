@@ -7,8 +7,6 @@ require_env JENKINS_API_USERPASS
 
 load_build_env
 
-PUBLISH_DIR="$BUILD_OUTPUT_HOME/export"
-
 # Remove TTY codes from a log file
 sanitize_log() {
     # See https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_(Control_Sequence_Introducer)_sequences

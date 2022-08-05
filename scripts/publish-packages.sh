@@ -203,6 +203,7 @@ if $DRY_RUN ; then
 fi
 
 mkdir -p "$TEMP_DIR"
+mkdir -p "$PUBLISH_ROOT"
 publish_3rdparty_sources
 publish_3rdparty_binaries
 publish_package_sources_and_binaries

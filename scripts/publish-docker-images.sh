@@ -11,8 +11,6 @@ load_build_env
 
 $DRY_RUN && exit 0 || :
 
-PUBLISH_DIR="$BUILD_OUTPUT_HOME/export"
-
 notice "publishing $DOCKER_BASE_OS $BUILD_STREAM docker image lists"
 src_dir="$STX_BUILD_HOME/workspace/std/build-images"
 dst_dir="$PUBLISH_DIR/outputs/docker-images"
